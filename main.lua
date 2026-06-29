@@ -1,28 +1,32 @@
 --[[
-    U.K HUB - KEY SYSTEM (FULL VERSION)
-    - Viền đen/xám chạy xoay vòng quanh khung chính.
-    - Ảnh góc dưới bên phải bo tròn viền xanh, hỗ trợ hiệu ứng click chuột mượt mà.
-    - Đã tích hợp kích hoạt Script Animal Hospital khi nhập đúng Key.
-    - Đã cập nhật link Get Key Discord mới.
+    U.K HUB - INTEGRATED KEY & LOADER SYSTEM
+    - Phần 1: Giao diện nhập Key chính thức (Key: U.KHUBFREEKEYANIMALHOPSPITAL6262-292)
+    - Phần 2: Sau khi đúng Key, tự động chuyển sang Loader thông báo hợp tác Venus Script trong 4s.
+    - Phần 3: Tải script chính thức từ GitHub.
 --]]
 
 local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
 local Clipboard = setclipboard or toclipboard
 local LocalPlayer = game.Players.LocalPlayer
 
 -- Xóa UI cũ nếu có để tránh trùng lặp
-local oldGui = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("UKHub_FixedSystem")
-if oldGui then oldGui:Destroy() end
+if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("UKHub_FixedSystem") then
+    LocalPlayer.PlayerGui.UKHub_FixedSystem:Destroy()
+end
+if CoreGui:FindFirstChild("VexusHubKeySystem") then
+    CoreGui.VexusHubKeySystem:Destroy()
+end
 
+-- ==========================================
+-- PHẦN 1: TẠO GIAO DIỆN NHẬP KEY (GUI KEY)
+-- ==========================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "UKHub_FixedSystem"
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- ==========================================
--- KHUNG CHÍNH (MAIN FRAME)
--- ==========================================
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 420, 0, 280)
@@ -35,7 +39,7 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 10)
 MainCorner.Parent = MainFrame
 
--- VIỀN CHẠY XOAY VÒNG VÒNG
+-- Viền chạy xoay vòng vòng của bảng Key
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Thickness = 2
 MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -58,9 +62,7 @@ task.spawn(function()
     end
 end)
 
--- ==========================================
--- LOGO NINJA (GÓC TRÊN BÊN PHẢI)
--- ==========================================
+-- Logo bảng Key
 local Logo = Instance.new("ImageLabel")
 Logo.Name = "Logo"
 Logo.Size = UDim2.new(0, 50, 0, 50)
@@ -79,9 +81,7 @@ LogoStroke.Thickness = 1.5
 LogoStroke.Color = Color3.fromRGB(0, 170, 255)
 LogoStroke.Parent = Logo
 
--- ==========================================
--- 🌟 NÚT ẢNH TRÒN GÓC DƯỚI BÊN PHẢI
--- ==========================================
+-- Nút ảnh tròn góc dưới bên phải
 local CustomImage = Instance.new("ImageButton")
 CustomImage.Name = "CustomBottomRightImage"
 CustomImage.Size = UDim2.new(0, 75, 0, 75)
@@ -101,16 +101,13 @@ ImageStroke.Thickness = 2
 ImageStroke.Color = Color3.fromRGB(0, 170, 255)
 ImageStroke.Parent = CustomImage
 
--- Hiệu ứng đàn hồi khi click
 CustomImage.MouseButton1Click:Connect(function()
     CustomImage:TweenSize(UDim2.new(0, 65, 0, 65), "Out", "Quad", 0.1, true, function()
         CustomImage:TweenSize(UDim2.new(0, 75, 0, 75), "Out", "Quad", 0.1, true)
     end)
 end)
 
--- ==========================================
--- TIÊU ĐỀ & CHỮ PHỤ CỦA GUI
--- ==========================================
+-- Tiêu đề bảng Key
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
 Title.Size = UDim2.new(0, 200, 0, 35)
@@ -135,9 +132,7 @@ SubTitle.TextSize = 14
 SubTitle.TextXAlignment = Enum.TextXAlignment.Left
 SubTitle.Parent = MainFrame
 
--- ==========================================
--- HÀNG NGANG: Ô NHẬP KEY & NÚT XÁC NHẬN
--- ==========================================
+-- Ô nhập & nút Check
 local InputRow = Instance.new("Frame")
 InputRow.Name = "InputRow"
 InputRow.Size = UDim2.new(1, -40, 0, 45)
@@ -178,9 +173,7 @@ local CheckCorner = Instance.new("UICorner")
 CheckCorner.CornerRadius = UDim.new(0, 100)
 CheckCorner.Parent = CheckBtn
 
--- ==========================================
--- NÚT GET KEY PHÍA DƯỚI (NẰM DỌC)
--- ==========================================
+-- Nút Get Key
 local GetKeyBtn = Instance.new("TextButton")
 GetKeyBtn.Name = "GetKeyBtn"
 GetKeyBtn.Size = UDim2.new(0, 130, 0, 40)
@@ -201,7 +194,6 @@ local GetKeyCorner = Instance.new("UICorner")
 GetKeyCorner.CornerRadius = UDim.new(0, 6)
 GetKeyCorner.Parent = GetKeyBtn
 
--- Thông báo trạng thái dưới đáy
 local StatusLabel = Instance.new("TextLabel")
 StatusLabel.Size = UDim2.new(1, 0, 0, 20)
 StatusLabel.Position = UDim2.new(0, 0, 1, -30)
@@ -213,20 +205,108 @@ StatusLabel.TextSize = 12
 StatusLabel.Parent = MainFrame
 
 -- ==========================================
--- SỰ KIỆN XỬ LÝ CHÍNH
+-- PHẦN 2: HÀM TẠO LOADER 4 GIÂY (SAU KHI ĐÚNG KEY)
+-- ==========================================
+local function OpenLoaderUI()
+    local LoaderGui = Instance.new("ScreenGui")
+    LoaderGui.Name = "VexusHubKeySystem"
+    LoaderGui.Parent = CoreGui
+    LoaderGui.ResetOnSpawn = false
+
+    local LoaderFrame = Instance.new("Frame")
+    LoaderFrame.Name = "MainFrame"
+    LoaderFrame.Parent = LoaderGui
+    LoaderFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+    LoaderFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    LoaderFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    LoaderFrame.Size = UDim2.new(0, 360, 0, 160)
+    LoaderFrame.Active = true
+    LoaderFrame.Draggable = true 
+    LoaderFrame.BackgroundTransparency = 1
+
+    local LoaderCorner = Instance.new("UICorner")
+    LoaderCorner.CornerRadius = UDim.new(0, 12)
+    LoaderCorner.Parent = LoaderFrame
+
+    -- Viền ĐEN lịch lãm cực nét cho loader
+    local LoaderStroke = Instance.new("UIStroke")
+    LoaderStroke.Thickness = 2 
+    LoaderStroke.Color = Color3.fromRGB(0, 0, 0)
+    LoaderStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    LoaderStroke.Transparency = 1
+    LoaderStroke.Parent = LoaderFrame
+
+    local LoaderTitle = Instance.new("TextLabel")
+    LoaderTitle.Name = "Title"
+    LoaderTitle.Parent = LoaderFrame
+    LoaderTitle.BackgroundTransparency = 1
+    LoaderTitle.Position = UDim2.new(0, 0, 0, 35)
+    LoaderTitle.Size = UDim2.new(1, 0, 0, 30)
+    LoaderTitle.Font = Enum.Font.GothamBold
+    LoaderTitle.Text = "U.K HUB"
+    LoaderTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    LoaderTitle.TextSize = 24
+    LoaderTitle.TextTransparency = 1
+
+    local LoaderSub = Instance.new("TextLabel")
+    LoaderSub.Name = "SubTitle"
+    LoaderSub.Parent = LoaderFrame
+    LoaderSub.BackgroundTransparency = 1
+    LoaderSub.Position = UDim2.new(0, 0, 0, 75)
+    LoaderSub.Size = UDim2.new(1, 0, 0, 20)
+    LoaderSub.Font = Enum.Font.GothamSemibold
+    LoaderSub.Text = "HỢP TÁC VỚI VENUS SCRIPT... (4S)"
+    LoaderSub.TextColor3 = Color3.fromRGB(140, 140, 145)
+    LoaderSub.TextSize = 13
+    LoaderSub.TextTransparency = 1
+
+    -- Hiệu ứng Fade In hiện hình mượt mà
+    local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(LoaderFrame, tweenInfo, {BackgroundTransparency = 0}):Play()
+    TweenService:Create(LoaderStroke, tweenInfo, {Transparency = 0}):Play()
+    TweenService:Create(LoaderTitle, tweenInfo, {TextTransparency = 0}):Play()
+    TweenService:Create(LoaderSub, tweenInfo, {TextTransparency = 0}):Play()
+
+    -- Đếm ngược 4 giây thông báo sự hợp tác
+    for i = 4, 1, -1 do
+        LoaderSub.Text = "HỢP TÁC VỚI VENUS SCRIPT... ("..i.."S)"
+        task.wait(1)
+    end
+
+    LoaderSub.Text = "ĐANG TẢI SCRIPT CHÍNH..."
+    LoaderSub.TextColor3 = Color3.fromRGB(0, 255, 130)
+    task.wait(0.5)
+
+    -- Hiệu ứng Fade Out biến mất mượt mà
+    local fadeOutInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+    TweenService:Create(LoaderFrame, fadeOutInfo, {BackgroundTransparency = 1}):Play()
+    TweenService:Create(LoaderStroke, fadeOutInfo, {Transparency = 1}):Play()
+    TweenService:Create(LoaderTitle, fadeOutInfo, {TextTransparency = 1}):Play()
+    TweenService:Create(LoaderSub, fadeOutInfo, {TextTransparency = 1}):Play()
+
+    task.wait(0.4)
+    LoaderGui:Destroy() -- Dọn sạch hoàn toàn Loader UI
+
+    -- ==========================================
+    -- PHẦN 3: KÍCH HOẠT SCRIPT CHÍNH TỪ GITHUB
+    -- ==========================================
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/eiis2id2idi/Vexus-hub/refs/heads/main/README.md"))()
+    end)
+end
+
+-- ==========================================
+-- SỰ KIỆN NÚT BẤM CỦA BẢNG KEY
 -- ==========================================
 CheckBtn.MouseButton1Click:Connect(function()
-    -- Kiểm tra key chính xác
     if TextBox.Text == "U.KHUBFREEKEYANIMALHOPSPITAL6262-292" then 
-        StatusLabel.Text = "Key chính xác! Đang tải Script..."
+        StatusLabel.Text = "Key chính xác!"
         StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-        task.wait(1)
-        ScreenGui:Destroy() -- Xóa giao diện nhập Key đi
+        task.wait(0.5)
+        ScreenGui:Destroy() -- Tắt ngay bảng Key
         
-        -- Kích hoạt chạy script Animal Hospital
-        pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/MinityD/roblox-utils/refs/heads/main/animal%20hospital.lua"))()
-        end)
+        -- Gọi chạy Loader thông báo kéo dài 4 giây ở trên
+        task.spawn(OpenLoaderUI)
     else
         StatusLabel.Text = "Sai key rồi bạn ơi, thử lại nhé!"
         StatusLabel.TextColor3 = Color3.fromRGB(255, 85, 85)
@@ -234,7 +314,7 @@ CheckBtn.MouseButton1Click:Connect(function()
 end)
 
 GetKeyBtn.MouseButton1Click:Connect(function()
-    local link = "https://discord.gg/m6kMDaGFX" -- Cập nhật link Discord mới của bạn tại đây
+    local link = "https://discord.gg/m6kMDaGFX"
     if Clipboard then
         Clipboard(link)
         StatusLabel.Text = "Đã sao chép link Discord thành công!"
