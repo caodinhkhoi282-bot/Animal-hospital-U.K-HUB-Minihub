@@ -1,7 +1,7 @@
 --[[
     U.K HUB - INTEGRATED KEY & LOADER SYSTEM
     - Phần 1: Giao diện nhập Key chính thức (Key: U.KHUBFREEKEYANIMALHOPSPITAL6262-292)
-    - Phần 2: Sau khi đúng Key, tự động chuyển sang Loader thông báo hợp tác Venus Script trong 4s.
+    - Phần 2: Sau khi đúng Key, tự động chuyển sang Loader thông báo hợp tác Vexus Script trong 4s.
     - Phần 3: Tải script chính thức từ GitHub.
 --]]
 
