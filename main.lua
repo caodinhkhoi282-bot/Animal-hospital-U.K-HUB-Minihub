@@ -255,7 +255,7 @@ local function OpenLoaderUI()
     LoaderSub.Position = UDim2.new(0, 0, 0, 75)
     LoaderSub.Size = UDim2.new(1, 0, 0, 20)
     LoaderSub.Font = Enum.Font.GothamSemibold
-    LoaderSub.Text = "HỢP TÁC VỚI VENUS SCRIPT... (4S)"
+    LoaderSub.Text = "HỢP TÁC VỚI VEXUS SCRIPT... (4S)"
     LoaderSub.TextColor3 = Color3.fromRGB(140, 140, 145)
     LoaderSub.TextSize = 13
     LoaderSub.TextTransparency = 1
