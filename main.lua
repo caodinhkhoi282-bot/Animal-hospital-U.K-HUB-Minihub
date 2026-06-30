@@ -269,7 +269,7 @@ local function OpenLoaderUI()
 
     -- Đếm ngược 4 giây thông báo sự hợp tác
     for i = 4, 1, -1 do
-        LoaderSub.Text = "HỢP TÁC VỚI VENUS SCRIPT... ("..i.."S)"
+        LoaderSub.Text = "HỢP TÁC VỚI VEXUS SCRIPT... ("..i.."S)"
         task.wait(1)
     end
 
